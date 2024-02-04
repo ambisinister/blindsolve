@@ -9,11 +9,10 @@ Why make this: I want to practice memorizing scrambles, since I have some practi
 ## Usage
 
 ```
-python3 main.py
+python3 app.py
 ```
 
 ## TODO
 
-- add user input
 - add timer
 - add a bunch of features

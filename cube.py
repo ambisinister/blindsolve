@@ -26,7 +26,7 @@ class RubiksCube:
     def rotate_face(self, face):
         return [list(row) for row in zip(*face[::-1])]
 
-    def display(self):
+    def display(self, buf=None):
         piece_size = 4
         sliver_width = 1  # 1/4th of the piece size
 
@@ -91,7 +91,12 @@ class RubiksCube:
         fig, ax = plt.subplots(figsize=(12, 9))
         ax.imshow(grid)
         ax.axis('off')
-        plt.show()
+
+        if buf:
+            plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
+            plt.close(fig)
+        else:
+            plt.show()
 
     def rotate_right(self):
         self.faces['R'] = self.rotate_face(self.faces['R'])
