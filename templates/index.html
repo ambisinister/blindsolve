@@ -11,8 +11,9 @@
     }
     #cube-container {
         margin: auto;
-        width: 350px;
-        height: 350px;
+        width: 70%;
+        height: 70%;
+	padding-bottom: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -38,6 +39,9 @@
     <button onclick="resetCube()">Reset</button>
 
     <script>
+        var isCubeHidden = false;
+        var cubeImageData;
+      
         function applyMoves() {
             var moves = document.getElementById('moveInput').value;
             fetch('/apply_moves', {
@@ -49,7 +53,11 @@
             })
             .then(response => response.json())
             .then(data => {
-                updateCubeImage(data.image);
+		if(!isCubeHidden) {
+		    updateCubeImage(data.image);
+		} else {
+		    cubeImageData = data.image;
+		}
             });
         }
 
@@ -74,21 +82,19 @@
             });
         }
 
-	var isCubeHidden = false;
-
         function toggleVisibility() {
 	    var cubeContainer = document.getElementById('cube-container');
 	    var button = document.getElementById('toggleVisibilityButton');
 
 	    if (isCubeHidden) {
-		loadInitialCubeState();
+		updateCubeImage(cubeImageData);
 		button.innerText = "Hide";
-		isCubeHidden = false;
 	    } else {
 		cubeContainer.innerHTML = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="Hidden"/>';
 		button.innerText = "Unhide";
-		isCubeHidden = true;
 	    }
+
+	    isCubeHidden = !isCubeHidden
 	}
 
         function resetCube() {
