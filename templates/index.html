@@ -16,7 +16,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        overflow: hidden;  /* To ensure nothing goes outside the container */
+        overflow: hidden;
     }
     #cube-container img {
         max-width: 100%;
@@ -34,11 +34,12 @@
     <input type="text" id="moveInput" placeholder="Enter moves">
     <button onclick="applyMoves()">Apply Moves</button>
     <button onclick="scrambleCube()">Scramble</button>
+    <button id="toggleVisibilityButton" onclick="toggleVisibility()">Hide</button>
+    <button onclick="resetCube()">Reset</button>
 
     <script>
         function applyMoves() {
             var moves = document.getElementById('moveInput').value;
-            // Make a request to Flask backend to apply the moves
             fetch('/apply_moves', {
                 method: 'POST',
                 body: moves,
@@ -53,7 +54,6 @@
         }
 
         function scrambleCube() {
-            // Make a request to Flask backend to scramble the cube
             fetch('/generate_scramble')
             .then(response => response.json())
             .then(data => {
@@ -62,7 +62,6 @@
         }
 
         function updateCubeImage(imageData) { 
-            // Update the cube container with the new image
             var cubeContainer = document.getElementById('cube-container');
             cubeContainer.innerHTML = '<img src="data:image/png;base64,' + imageData + '" alt="Rubik\'s Cube"/>';
         }
@@ -75,7 +74,35 @@
             });
         }
 
-        window.onload = loadInitialCubeState;  // Call this function when the page loads
+	var isCubeHidden = false;
+
+        function toggleVisibility() {
+	    var cubeContainer = document.getElementById('cube-container');
+	    var button = document.getElementById('toggleVisibilityButton');
+
+	    if (isCubeHidden) {
+		loadInitialCubeState();
+		button.innerText = "Hide";
+		isCubeHidden = false;
+	    } else {
+		cubeContainer.innerHTML = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="Hidden"/>';
+		button.innerText = "Unhide";
+		isCubeHidden = true;
+	    }
+	}
+
+        function resetCube() {
+	    fetch('/reset_cube')
+		.then(response => response.json())
+		.then(data => {
+		    updateCubeImage(data.image);
+		});
+	}
+
+      window.onload = loadInitialCubeState;
+      window.onload = function() {
+	  resetCube();
+      };
 
     </script>
 </body>

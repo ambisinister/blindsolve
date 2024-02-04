@@ -39,5 +39,11 @@ def generate_scramble():
     cube.apply_moves(scramble)
     return display_cube()
 
+@app.route('/reset_cube', methods=['GET'])
+def reset_cube():
+    global cube
+    cube = RubiksCube()
+    return display_cube()
+
 if __name__ == '__main__':
     app.run(debug=True)
