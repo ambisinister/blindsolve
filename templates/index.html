@@ -29,6 +29,7 @@
 </head>
 <body>
     <h1>Rubik's Cube Blindsolving Trainer</h1>
+    <div id="timer">0:00.00</div>
     <div id="cube-container">
         <!-- Cube image will be displayed here -->
     </div>
@@ -39,6 +40,33 @@
     <button onclick="resetCube()">Reset</button>
 
     <script>
+        var timer;
+        var isTimerRunning = false;
+        var startTime;
+
+        function startTimer() {
+	    if (!isTimerRunning) {
+		startTime = Date.now()
+		timer = setInterval(updateTimer, 10);
+		isTimerRunning = true;
+	    }
+	}
+
+        function stopTimer() {
+	    if (isTimerRunning) {
+		clearInterval(timer);
+		isTimerRunning = false;
+	    }
+	}
+
+        function updateTimer() {
+	    var elapsedTime = Date.now() - startTime;
+	    var seconds = Math.floor(elapsedTime / 1000) % 60;
+	    var minutes = Math.floor(elapsedTime / 60000);
+	    var millis = Math.floor(elapsedTime / 10 % 100)
+	    document.getElementById('timer').innerText = minutes + ':' + (seconds < 10 ? '0' : '') + seconds + '.' + (millis < 10 ? '0' : '') + millis;
+        }
+        
         var isCubeHidden = false;
         var cubeImageData;
       
@@ -53,20 +81,27 @@
             })
             .then(response => response.json())
             .then(data => {
+		cubeImageData = data.image;
 		if(!isCubeHidden) {
 		    updateCubeImage(data.image);
-		} else {
-		    cubeImageData = data.image;
 		}
             });
+	    stopTimer();
         }
 
         function scrambleCube() {
-            fetch('/generate_scramble')
+	    var button = document.getElementById('toggleVisibilityButton');	    
+
+	    stopTimer();
+	    button.innerText = "Hide";
+	    
+	    fetch('/generate_scramble')
             .then(response => response.json())
             .then(data => {
-                updateCubeImage(data.image);
+		cubeImageData = data.image;
+		updateCubeImage(data.image);
             });
+	    startTimer();
         }
 
         function updateCubeImage(imageData) { 
@@ -90,7 +125,7 @@
 		updateCubeImage(cubeImageData);
 		button.innerText = "Hide";
 	    } else {
-		cubeContainer.innerHTML = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="Hidden"/>';
+		cubeContainer.innerHTML = '<img src="/static/solve_in_progress.png" alt="Solve in Progress"/>';
 		button.innerText = "Unhide";
 	    }
 
@@ -103,10 +138,11 @@
 		.then(data => {
 		    updateCubeImage(data.image);
 		});
+	    stopTimer();
 	}
 
-      window.onload = loadInitialCubeState;
       window.onload = function() {
+	  loadInitialCubeState();
 	  resetCube();
       };
 
