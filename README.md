@@ -14,5 +14,5 @@ python3 app.py
 
 ## TODO
 
-- add timer
-- add a bunch of features
+- Make it pretty
+- Add pure keyboard controls
